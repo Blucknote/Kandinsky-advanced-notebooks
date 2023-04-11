@@ -70,6 +70,24 @@ cfg_scale = widgets.FloatSlider(
 )
 display(cfg_scale)
 
+prior_scale = widgets.IntSlider(
+    value=4,
+    min=1,
+    max=20,
+    step=1,
+    description='Prior scale:',
+)
+display(prior_scale)
+
+prior_steps = widgets.IntSlider(
+    value=5,
+    min=1,
+    max=20,
+    step=1,
+    description='Prior steps:',
+)
+display(prior_steps)
+
 height = widgets.IntSlider(
     value=768,
     min=128,

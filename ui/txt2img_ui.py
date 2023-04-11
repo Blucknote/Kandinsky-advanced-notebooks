@@ -19,8 +19,8 @@ def txt2img(event):
             h=ui.height.value,
             w=ui.width.value,
             sampler=ui.sampler.value, 
-            prior_cf_scale=4,
-            prior_steps="5"
+            prior_cf_scale=ui.prior_scale.value,
+            prior_steps=str(ui.prior_steps.value),
         )
         main.torch_gc()
         if ui.im_per_iter.value:

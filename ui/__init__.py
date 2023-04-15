@@ -18,6 +18,12 @@ gen_info = widgets.Checkbox(
 )
 display(gen_info)
 
+corners = widgets.Checkbox(
+    value=False,
+    description='Image with rounded corners',
+)
+display(corners)
+
 def formatted_now():
     return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -123,7 +129,7 @@ sampler = widgets.Dropdown(
 )
 display(sampler)
 
-def add_gen_info(image: Image):
+def add_gen_info(image: Image) -> Image:
 
     font = ImageFont.truetype("Roboto-Regular.ttf", size=18)
     text = (
@@ -174,10 +180,26 @@ def add_gen_info(image: Image):
     return new_img
 
 
+def add_corners(image: Image, rad: int) -> Image:
+    circle = Image.new('L', (rad * 2, rad * 2), 0)
+    draw = ImageDraw.Draw(circle)
+    draw.ellipse((0, 0, rad * 2 - 1, rad * 2 - 1), fill=255)
+    alpha = Image.new('L', image.size, 255)
+    w, h = image.size
+    alpha.paste(circle.crop((0, 0, rad, rad)), (0, 0))
+    alpha.paste(circle.crop((0, rad, rad, rad * 2)), (0, h - rad))
+    alpha.paste(circle.crop((rad, 0, rad * 2, rad)), (w - rad, 0))
+    alpha.paste(circle.crop((rad, rad, rad * 2, rad * 2)), (w - rad, h - rad))
+    image.putalpha(alpha)
+    return image
+
+
 def images_processing(images):
     for postfix, img in enumerate(images):
         if gen_info.value:
             img = add_gen_info(img)
+        if corners.value:
+            img = add_corners(img, 50)
         display(img)
         if save_imgs.value:
             prefix = locals().get(img_name_prefix.value, formatted_now)()

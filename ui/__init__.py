@@ -1,5 +1,8 @@
+import main
+
 from datetime import datetime
 from os import path
+from time import sleep
 
 import torch
 import ipywidgets as widgets
@@ -208,4 +211,8 @@ def images_processing(images):
             img.save(s_path)
 
 generate = widgets.Button(description="Generate")
-display(generate)
+
+while not main.model:
+    sleep(2)
+else:
+    display(generate)

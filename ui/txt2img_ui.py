@@ -21,6 +21,8 @@ def txt2img(event):
             sampler=ui.sampler.value, 
             prior_cf_scale=ui.prior_scale.value,
             prior_steps=str(ui.prior_steps.value),
+            negative_prior_prompt=ui.neg_prior.value,
+            negative_decoder_prompt=ui.neg_prompt.value,
         )
         main.torch_gc()
         if ui.im_per_iter.value:

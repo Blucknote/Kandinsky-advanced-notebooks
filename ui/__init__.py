@@ -9,23 +9,23 @@ import ipywidgets as widgets
 from PIL import Image, ImageDraw, ImageOps, ImageFont
 
 
+style = {'description_width': 'initial', 'padding': '10px'}
+
 im_per_iter = widgets.Checkbox(
-    value=False,
+    value=True,
     description='Display image per iteration',
 )
-display(im_per_iter)
 
 gen_info = widgets.Checkbox(
     value=False,
-    description='Include generation info at bottof of image',
+    description='Include generation info at bottom of image',
+    style=style
 )
-display(gen_info)
 
 corners = widgets.Checkbox(
     value=False,
     description='Image with rounded corners',
 )
-display(corners)
 
 def formatted_now():
     return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -34,24 +34,31 @@ save_imgs = widgets.Checkbox(
     value=False,
     description='Save all out images',
 )
-
-display(save_imgs)
-
 save_path = widgets.Text(value="", description='Save path:')
-display(save_path)
-
 img_name_prefix = widgets.Text(value="formatted_now", description='Name prefix:')
-display(img_name_prefix)
+
+img_saving_box = widgets.VBox([save_imgs, save_path, img_name_prefix])
+img_saving_accordion = widgets.Accordion(children=[img_saving_box])
+img_saving_accordion.set_title(0, 'Image saving')
+
+img_pprocess_box = widgets.VBox([im_per_iter, gen_info, corners, img_saving_accordion])
+img_pprocess = widgets.Accordion(children=[img_pprocess_box])
+img_pprocess.set_title(0, 'Image post processing')
+display(img_pprocess)
 
 prompt = widgets.Textarea(value="", description='Prompt:')
-display(prompt)
+neg_prompt = widgets.Textarea(value="", description='Negative decoder prompt:', style=style)
+neg_prior = widgets.Textarea(value="", description='Negative prior prompt:', style=style)
+neg_box = widgets.VBox([neg_prior, neg_prompt])
+
+prompts = widgets.HBox([prompt, neg_box])
+display(prompts)
 
 seed = widgets.IntText(
     value=-1,
     description='Seed:',
     disabled=False
 )
-display(seed)
 
 steps = widgets.IntSlider(
     value=30,
@@ -60,14 +67,21 @@ steps = widgets.IntSlider(
 )
 display(steps)
 
+sampler = widgets.Dropdown(
+    options=['ddim_sampler', 'p_sampler', 'plms_sampler'],
+    value='p_sampler',
+    description='Sampler:',
+    disabled=False,
+)
+display(sampler)
+
 n_iter = widgets.IntSlider(
     value=6,
     min=1,
     max=20,
     step=1,
-    description='Total images:',
+    description='Batch count:',
 )
-display(n_iter)
 
 batch_size = widgets.IntSlider(
     value=1,
@@ -76,7 +90,9 @@ batch_size = widgets.IntSlider(
     step=1,
     description='Batch size:',
 )
-display(batch_size)
+
+batches = widgets.HBox([n_iter, batch_size])
+display(batches)
 
 cfg_scale = widgets.FloatSlider(
     value=7.5,
@@ -86,7 +102,6 @@ cfg_scale = widgets.FloatSlider(
     description='Cfg scale:',
     readout_format='.1f',
 )
-display(cfg_scale)
 
 prior_scale = widgets.IntSlider(
     value=4,
@@ -95,7 +110,6 @@ prior_scale = widgets.IntSlider(
     step=1,
     description='Prior scale:',
 )
-display(prior_scale)
 
 prior_steps = widgets.IntSlider(
     value=5,
@@ -104,7 +118,11 @@ prior_steps = widgets.IntSlider(
     step=1,
     description='Prior steps:',
 )
-display(prior_steps)
+
+prior_box = widgets.VBox([prior_scale, prior_steps])
+
+scales = widgets.HBox([cfg_scale, prior_box])
+display(scales)
 
 height = widgets.IntSlider(
     value=768,
@@ -113,7 +131,6 @@ height = widgets.IntSlider(
     step=2,
     description='Height:',
 )
-display(height)
 
 width = widgets.IntSlider(
     value=768,
@@ -123,14 +140,7 @@ width = widgets.IntSlider(
     description='Width:',
 )
 display(width)
-
-sampler = widgets.Dropdown(
-    options=['ddim_sampler', 'p_sampler', 'plms_sampler'],
-    value='p_sampler',
-    description='Sampler:',
-    disabled=False,
-)
-display(sampler)
+display(height)
 
 def add_gen_info(image: Image) -> Image:
 
@@ -210,6 +220,7 @@ def images_processing(images):
             s_path = path.join(save_path.value, fname)
             img.save(s_path)
 
+display(seed)
 generate = widgets.Button(description="Generate")
 
 while not main.model:

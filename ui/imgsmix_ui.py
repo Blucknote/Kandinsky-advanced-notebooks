@@ -12,8 +12,7 @@ img2 = ui.widgets.FileUpload(
     accept='image/*',
     multiple=False,
 )
-display(img1)
-display(img2)
+
 
 preview = ui.widgets.Output()
 
@@ -49,7 +48,7 @@ img_w1 = ui.widgets.FloatSlider(
     description='IMG1 weigth:',
     readout_format='.1f',
 )
-display(img_w1)
+
 
 img_w2 = ui.widgets.FloatSlider(
     value=0.5,
@@ -59,8 +58,12 @@ img_w2 = ui.widgets.FloatSlider(
     description='IMG2 weigth:',
     readout_format='.1f',
 )
-display(img_w2)
 
+img_box1 = ui.widgets.widgets.VBox([img1, img_w1])
+img_box2 = ui.widgets.widgets.VBox([img2, img_w2])
+
+imgs_box = ui.widgets.HBox([img_box1, img_box2])
+display(imgs_box)
 
 def center_crop(image):
     width, height = image.size
@@ -103,5 +106,10 @@ def imgmix(event):
     if not ui.im_per_iter.value and images:
         ui.images_processing(images)
 
-ui.generate.on_click(imgmix)
+ui.prompts.close()
+ui.generate.close()
+
+mix = ui.widgets.Button(description="Mix")
+mix.on_click(imgmix)
+display(mix)
 display(out)
